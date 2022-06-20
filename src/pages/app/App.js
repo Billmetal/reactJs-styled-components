@@ -1,11 +1,36 @@
+import { useState } from "react";
 import styled from "styled-components";
 import kerriganImage from "../../images/kerr02.png";
 import { Quotes } from "../../components";
+import { getQuote } from "../../service";
+
+let i = -1;
+
+function index(len) { 
+    if (i === (len - 1)) {
+        i = -1;
+    }
+    i++;
+    console.log(i);
+    return i;
+}
 
 export function App() { 
+    const [quoteState, setQuoteState] = useState({ quote: "ok", speaker: "Speaker" });
+
+    /** API return
+     * my api return is a array (Ex: [{ quote: "ok", speaker: "Speaker" }]) 
+     * I needed to create a function "index(len)" that received a param with the array lenght and
+     * changing the index using the variable "i" on each button click.
+     * **/
+    const onUpdate = async () => {  
+        const quote = await getQuote();
+        setQuoteState(quote[index(quote.length)]);
+    };
+
     return (
         <Content>
-            <Quotes quote={"Que frase hein"} speaker={"Speaker"}/>
+            <Quotes {...quoteState} onUpdate={onUpdate} />
             <KerrImge src={kerriganImage} alt="Kerrigan"/>
         </Content>
     );
