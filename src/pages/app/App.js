@@ -1,32 +1,43 @@
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import styled from "styled-components";
 import kerriganImage from "../../images/kerr02.png";
 import { Quotes } from "../../components";
 import { getQuote } from "../../service";
+import { sounds } from "../../sounds";
 
-let i = -1;
+let i = 1;
 
 function index(len) { 
     if (i === (len - 1)) {
         i = -1;
     }
     i++;
-    console.log(i);
     return i;
 }
 
 export function App() { 
-    const [quoteState, setQuoteState] = useState({ quote: "ok", speaker: "Speaker" });
+    let isMounted = useRef(true);
+
+    const [quoteState, setQuoteState] = useState({ quote: "loading quote ...", speaker: "loading speaker ..." });
 
     /** API return
      * my api return is a array (Ex: [{ quote: "ok", speaker: "Speaker" }]) 
      * I needed to create a function "index(len)" that received a param with the array lenght and
      * changing the index using the variable "i" on each button click.
      * **/
-    const onUpdate = async () => {  
+    const onUpdate = async () => { 
         const quote = await getQuote();
-        setQuoteState(quote[index(quote.length)]);
+        if (isMounted.current) {
+            let v = index(quote.length);
+            let audio = new Audio(sounds[v]);
+            setQuoteState(quote[v]);
+            audio.play();
+        }
     };
+
+    useEffect(() => { 
+        onUpdate();
+    },[]);
 
     return (
         <Content>
@@ -45,7 +56,7 @@ const Content = styled.div`
 `;
 
 const KerrImge = styled.img`
-    width: 25vw;
-    height: 70vh;
+    width: 400px;
+    height: 700px;
     align-self: flex-end;
 `;

@@ -3,7 +3,7 @@ import { App } from "./App";
 import { rest } from "msw";
 import { setupServer } from "msw/node";
 
-const response = { speaker: "Speaker", quote: "Test quote" };
+const response = [{ speaker: "Speaker", quote: "Test quote" }];
 
 const server = setupServer(
     rest.get(process.env.REACT_APP_API, (req, res, ctx) => { 
@@ -20,7 +20,7 @@ test("renders the app with a button, quote and a image", () => {
     
     const buttonEl = screen.getByRole('button');
     const imageEl = screen.getByRole("img");
-    const textEl = screen.getByText(/Speaker/);
+    const textEl = screen.getByText(/loading speaker/);
 
     expect(buttonEl).toBeInTheDocument();
     expect(imageEl).toBeInTheDocument();
@@ -31,6 +31,12 @@ test("calls api on button click and update text", async () => {
     render(<App />);    
     const buttonEl = screen.getByRole('button');
     fireEvent.click(buttonEl);
-    const quoteEl = await screen.findByText(response.quote);
+    const quoteEl = await screen.findByText(response[0].quote);
+    expect(quoteEl).toBeInTheDocument();
+});
+
+test("calls api on stratup and renders it response", async () => { 
+    render(<App />);
+    const quoteEl = await screen.findByText(response[0].quote);
     expect(quoteEl).toBeInTheDocument();
 });
